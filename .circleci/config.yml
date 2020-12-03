@@ -5,6 +5,10 @@ version: 2.1
 defaults: &defaults
   docker:
     - image: circleci/node:13.8.0
+commands:
+  print_pipeline_id:
+    steps:
+      run: echo $CIRCLE_WORKFLOW_ID
 jobs:
 #  print_hello:
 #    docker:
@@ -39,6 +43,11 @@ jobs:
           command: |
             echo $firstname
 
+  test_command:
+    <<: *defaults
+    steps:
+      - print_pipeline_id
+
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
@@ -47,6 +56,7 @@ workflows:
     jobs:
       - save_hello_world_output
       - build
+      - test_command
       - print_output_file:
           requires:
             - save_hello_world_output
