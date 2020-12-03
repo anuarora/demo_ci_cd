@@ -12,9 +12,9 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - run: echo world
-  print_name:
+  build:
     docker:
-      image: cimg/base:2020.01
+      - image: cimg/base:2020.01
     steps:
       - checkout
       - name: "echo an env value"
@@ -28,6 +28,7 @@ workflows:
     # Run the welcome/run job in its own container
     jobs:
       - print_hello
+      - build
       - print_world:
           requires:
             - print_hello
