@@ -12,6 +12,14 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - run: echo world
+  print_name:
+    docker:
+      image: cimg/base:2020.01
+    steps:
+      - checkout
+      - name: "echo an env value"
+        command: |
+          echo $firstname
 
 # Orchestrate or schedule a set of jobs
 workflows:
