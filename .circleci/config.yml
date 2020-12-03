@@ -17,9 +17,10 @@ jobs:
       - image: cimg/base:2020.01
     steps:
       - checkout
-      - name: "echo an env value"
-        command: |
-          echo $firstname
+      - run:
+          name: "echo an env value"
+          command: |
+            echo $firstname
 
 # Orchestrate or schedule a set of jobs
 workflows:
