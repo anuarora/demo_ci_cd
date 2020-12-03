@@ -42,11 +42,21 @@ jobs:
           name: "echo an env value"
           command: |
             echo $firstname
-
+  return_non_zero:
+    <<: *defaults
+    steps:
+      - run: return 1
+      - run:
+         name: on error
+         command: echo "Hello Error!"
+         when: on_fail
   test_command:
     <<: *defaults
     steps:
       - print_pipeline_id
+
+
+
 
 # Orchestrate or schedule a set of jobs
 workflows:
@@ -57,6 +67,7 @@ workflows:
       - save_hello_world_output
       - build
       - test_command
+      - return_non_zero
       - print_output_file:
           requires:
             - save_hello_world_output
