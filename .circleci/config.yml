@@ -55,9 +55,6 @@ jobs:
     steps:
       - print_pipeline_id
 
-
-
-
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
