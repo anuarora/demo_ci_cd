@@ -65,18 +65,28 @@ jobs:
             aws cloudformation deploy \
               --template-file template.yml \
               --stack-name my-stack
-  ansible_playbook:
+  configure_infra:
     docker:
       - image: python:3.7-alpine3.11
-
-
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["77:0f:a5:61:25:e2:0a:c8:ea:41:45:a5:8a:34:49:00"] # You can get this ID in the section where you registered the SSH Key
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible # install the dependencies needed for your playbook
+      - run:
+          name: Configure server
+          command: |
+            ansible-playbook -i inventory.txt main-remote.yml
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
   welcome:
     # Run the welcome/run job in its own container
     jobs:
-      - ansible_playbook
+      - configure_infra
 #      - create_infrastructure
 #      - save_hello_world_output
 #      - build
