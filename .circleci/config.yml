@@ -9,6 +9,13 @@ commands:
   print_pipeline_id:
     steps:
       - run: echo $CIRCLE_WORKFLOW_ID
+  destroy_environment:
+    steps:
+      - run:
+          name: Destroy environment
+          command: |
+            aws cloudformation delete-stack --stack-name prod-${CIRCLE_WORKFLOW_ID}
+
 jobs:
 #  print_hello:
 #    docker:
@@ -60,11 +67,15 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Ensure backend infrastructure exist
+         name: Create Stack
           command: |
             aws cloudformation deploy \
               --template-file template.yml \
-              --stack-name my-stack
+              --stack-name prod-${CIRCLE_WORKFLOW_ID}
+      - run: return 1
+      - destroy_environment
+        when: on_fail
+
   configure_infra:
     docker:
       - image: python:3.7-alpine3.11
@@ -80,14 +91,34 @@ jobs:
           name: Configure server
           command: |
             ansible-playbook -i inventory.txt main-remote.yml
+  smoke_test:
+    <<: *defaults
+    steps:
+      - run: apk add --update curl
+      - run:
+          name: smoke test.
+          command: |
+            URL="https://blog.udacity.com/"
+            if curl -s --head ${URL} # test if blog.udacity. com exists
+            then
+             return 0
+            else
+             return 1
+            fi
+
+  destroy_environments:
+
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
   welcome:
     # Run the welcome/run job in its own container
     jobs:
-      - configure_infra
-#      - create_infrastructure
+#       - smoke_test
+#          requires:
+#             - configure_infra
+#      - configure_infra
+      - create_infrastructure
 #      - save_hello_world_output
 #      - build
 #      - test_command
