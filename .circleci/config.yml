@@ -65,6 +65,10 @@ jobs:
             aws cloudformation deploy \
               --template-file template.yml \
               --stack-name my-stack
+  ansible_playbook:
+    docker:
+      - image: python:3.7-alpine3.11
+
 
 # Orchestrate or schedule a set of jobs
 workflows:
@@ -72,11 +76,12 @@ workflows:
   welcome:
     # Run the welcome/run job in its own container
     jobs:
-      - create_infrastructure
-      - save_hello_world_output
-      - build
-      - test_command
-      - return_non_zero
-      - print_output_file:
-          requires:
-            - save_hello_world_output
+      - ansible_playbook
+#      - create_infrastructure
+#      - save_hello_world_output
+#      - build
+#      - test_command
+#      - return_non_zero
+#      - print_output_file:
+#          requires:
+#            - save_hello_world_output
