@@ -54,6 +54,17 @@ jobs:
     <<: *defaults
     steps:
       - print_pipeline_id
+  create_infrastructure:
+    docker:
+      image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Ensure backend infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file ../template.yml \
+              --stack-name my-stack
 
 # Orchestrate or schedule a set of jobs
 workflows:
@@ -61,6 +72,7 @@ workflows:
   welcome:
     # Run the welcome/run job in its own container
     jobs:
+      - create_infrastructure
       - save_hello_world_output
       - build
       - test_command
